@@ -12,11 +12,13 @@ The project consists of 3 classes (SPF, DMARC and DKIM) plus the base class from
 
 You can use each of these classes in your code as follows:
 
+```
 SPF spf = new SPF ();
 spf.Domain = Target;
 
 The Found property indicates if the setting (in this case for SPF but the operation is the same also for DMARC and DKIM) has been found
 
+```
 if (spf.Found)
 {
       // SPF found
