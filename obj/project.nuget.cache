@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "6eUnQWDXeRR5O7Y1AqWdXJlqhy5UJM91GtR5D7xtkECImRCDkoCJcAGhQIl9elom/Y65/maLRiZc88MBxS7pdg==",
+  "success": true,
+  "projectFilePath": "/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/SPF-DMARC-DKIM.csproj",
+  "expectedPackageFiles": [
+    "/Users/matteosala/.nuget/packages/dnsclient/1.6.1/dnsclient.1.6.1.nupkg.sha512",
+    "/Users/matteosala/.nuget/packages/microsoft.netcore.platforms/5.0.0/microsoft.netcore.platforms.5.0.0.nupkg.sha512",
+    "/Users/matteosala/.nuget/packages/microsoft.win32.registry/5.0.0/microsoft.win32.registry.5.0.0.nupkg.sha512",
+    "/Users/matteosala/.nuget/packages/system.security.accesscontrol/5.0.0/system.security.accesscontrol.5.0.0.nupkg.sha512",
+    "/Users/matteosala/.nuget/packages/system.security.principal.windows/5.0.0/system.security.principal.windows.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

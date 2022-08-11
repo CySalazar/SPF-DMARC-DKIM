@@ -1,0 +1,17 @@
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/bin/Debug/net6.0/SPF-DMARC-DKIM
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/bin/Debug/net6.0/SPF-DMARC-DKIM.deps.json
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/bin/Debug/net6.0/SPF-DMARC-DKIM.runtimeconfig.json
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/bin/Debug/net6.0/SPF-DMARC-DKIM.dll
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/bin/Debug/net6.0/SPF-DMARC-DKIM.pdb
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/bin/Debug/net6.0/DnsClient.dll
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/obj/Debug/net6.0/SPF-DMARC-DKIM.csproj.AssemblyReference.cache
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/obj/Debug/net6.0/SPF-DMARC-DKIM.GeneratedMSBuildEditorConfig.editorconfig
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/obj/Debug/net6.0/SPF-DMARC-DKIM.AssemblyInfoInputs.cache
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/obj/Debug/net6.0/SPF-DMARC-DKIM.AssemblyInfo.cs
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/obj/Debug/net6.0/SPF-DMARC-DKIM.csproj.CoreCompileInputs.cache
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/obj/Debug/net6.0/SPF-DMARC-DKIM.csproj.CopyComplete
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/obj/Debug/net6.0/SPF-DMARC-DKIM.dll
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/obj/Debug/net6.0/refint/SPF-DMARC-DKIM.dll
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/obj/Debug/net6.0/SPF-DMARC-DKIM.pdb
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/obj/Debug/net6.0/SPF-DMARC-DKIM.genruntimeconfig.cache
+/Users/matteosala/Documents/GitHub/SPF-DMARC-DKIM/obj/Debug/net6.0/ref/SPF-DMARC-DKIM.dll
