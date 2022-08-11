@@ -15,6 +15,7 @@ You can use each of these classes in your code as follows:
 ```
 SPF spf = new SPF ();
 spf.Domain = Target;
+```
 
 The Found property indicates if the setting (in this case for SPF but the operation is the same also for DMARC and DKIM) has been found
 
@@ -28,6 +29,7 @@ else
 {
       // SPF not found
 }
+```
 
 The Record property contains the value of the dns record related to the SPF setting (similarly also for DMARC and DKIM)
 
