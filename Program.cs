@@ -1,7 +1,18 @@
 ﻿using DNSLib;
 
-Console.Write("Domain: "); string? tmp = Console.ReadLine();
-string Target = tmp != null ? tmp : string.Empty;
+string[] arguments = Environment.GetCommandLineArgs();
+string Target = string.Empty;
+
+if(arguments.Length >= 2)
+{
+    Target = arguments[1];
+}
+else
+{
+    Console.Write("Domain: "); string? tmp = Console.ReadLine();
+    Target = tmp != null ? tmp : string.Empty;
+}
+
 var prevCol = Console.ForegroundColor;
 var dnsSec = new DNSSec();
 Target = dnsSec.FormatTarget(Target);
