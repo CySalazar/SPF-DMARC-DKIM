@@ -1,4 +1,5 @@
 using System.Net;
+using System.Linq;
 
 namespace DNSLib
 {
@@ -50,9 +51,9 @@ namespace DNSLib
             {
                 host = Dns.GetHostEntry(address);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return string.Empty;
+                throw new Exception(e.Message);
             }
 
 
@@ -68,6 +69,8 @@ namespace DNSLib
         {
             string sTarget = Target;
             string[] saVector;
+            string[] strRemove = { "http://", "https://", "ftp://", "sftp://", 
+                "scp://", "ssh://", "tls://", "sftp2://", "tftp://", "ftps://" };
             IPAddress? IPTmp;
 
             if (string.IsNullOrEmpty(Target) || string.IsNullOrWhiteSpace(Target) ||
@@ -84,21 +87,15 @@ namespace DNSLib
 
             try
             {
-                sTarget = sTarget.Replace("http://", "");
-                sTarget = sTarget.Replace("https://", "");
-                sTarget = sTarget.Replace("ftp://", "");
-                sTarget = sTarget.Replace("sftp://", "");
-                sTarget = sTarget.Replace("scp://", "");
-                sTarget = sTarget.Replace("ssh://", "");
-                sTarget = sTarget.Replace("tls://", "");
-                sTarget = sTarget.Replace("sftp2://", "");
-                sTarget = sTarget.Replace("tftp://", "");
-                sTarget = sTarget.Replace("ftps://", "");
-                sTarget = sTarget.Substring(0, sTarget.IndexOf('/'));
+                foreach (string item in strRemove)
+                {
+                    sTarget = sTarget.Contains(item) ? sTarget.Replace(item, "") : sTarget;
+                }
+                sTarget = sTarget.Contains('/') ? sTarget.Substring(0, sTarget.IndexOf('/')) : sTarget;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ;
+                throw new Exception(e.Message);
             }
 
             saVector = sTarget.Split('.');
@@ -124,9 +121,9 @@ namespace DNSLib
 
                 return saVector[saVector.Length - 2] + "." + saVector[saVector.Length - 1];
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return string.Empty;
+                throw new Exception(e.Message);
             }
         }
 
@@ -139,12 +136,12 @@ namespace DNSLib
 			
 			if(Source == null)
 			{
-				return Results;
+				throw new ArgumentNullException();
 			}
 			
 			if(Source.Count == 0)
 			{
-				return Results;
+				throw new ArgumentException();
 			}
 			
 			while (Source.Count > 0)
