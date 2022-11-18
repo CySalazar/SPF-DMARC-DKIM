@@ -22,7 +22,8 @@ namespace DNSLib
             "k1", "k2", "k3", "k4", "k5", "m1", "m2", "m3", "m4", "m5", "mail", "mandrill", "my1",
             "my2", "my3", "my4", "my5", "pf2014", "pm", "proddkim1024", "rit1608", "s1", "s1024",
             "s2", "s2048", "s5", "s512", "s7", "s768", "selector1", "selector1-ebsmd-com0i",
-            "selector1-wwecorp-com", "selector2", "smtp", "smtpapi", "test", "zendesk", "zendesk1"
+            "selector1-wwecorp-com", "selector2", "smtp", "smtpapi", "test", "zendesk", "zendesk1",
+            "ml", "consulenze"
         };
         private List<string> _selectorsFound = new List<string>();
 
