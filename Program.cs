@@ -25,14 +25,70 @@ try
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("Dominio non valido o vuoto.");
         Console.ForegroundColor = prevCol;
+
+    // Mostra tutti i record TXT
+    try
+    {
+        Console.WriteLine("\nRecord TXT trovati:");
+        var txtClient = new DnsClient.LookupClient();
+        var txtResults = txtClient.Query(Target, DnsClient.QueryType.TXT);
+        foreach (var record in txtResults.AllRecords)
+        {
+            if (record.RecordType.ToString() == "TXT")
+                Console.WriteLine($"\t{record}");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"[Warning] Impossibile recuperare i record TXT: {ex.Message}");
+        Console.ForegroundColor = prevCol;
+    }
+
+    // Mostra tutti i record MX
+    try
+    {
+        Console.WriteLine("\nRecord MX trovati:");
+        var mxClient = new DnsClient.LookupClient();
+        var mxResults = mxClient.Query(Target, DnsClient.QueryType.MX);
+        foreach (var record in mxResults.AllRecords)
+        {
+            if (record.RecordType.ToString() == "MX")
+                Console.WriteLine($"\t{record}");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"[Warning] Impossibile recuperare i record MX: {ex.Message}");
+        Console.ForegroundColor = prevCol;
+    }
         return;
     }
 
-    // Verifico la presenza delle impostazioni per SPF nei record TXT
-    Console.Write($"Checking SPF for {Target}");
+    // Spinner utility
+    void ShowSpinner(ref bool running, string message)
+    {
+        var spinnerChars = new[] { '|', '/', '-', '\\' };
+        int idx = 0;
+        Console.Write(message + " ");
+        while (running)
+        {
+            Console.Write(spinnerChars[idx++ % spinnerChars.Length]);
+            Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+            Thread.Sleep(80);
+        }
+        Console.Write(" "); // clear spinner
+    }
 
+    // SPF
+    bool spfRunning = true;
+    var spfSpinner = new Thread(() => ShowSpinner(ref spfRunning, $"Checking SPF for {Target}"));
+    spfSpinner.Start();
     SPF spf = new SPF();
     spf.Domain = Target;
+    spfRunning = false;
+    spfSpinner.Join();
 
     if (spf.Found)
     {
@@ -52,11 +108,14 @@ try
 
     Console.ForegroundColor = prevCol;
 
-    // Verifico la presenza delle impostazioni per DMARC 
-    Console.Write($"\nChecking DMARC for {Target}");
-
+    // DMARC
+    bool dmarcRunning = true;
+    var dmarcSpinner = new Thread(() => ShowSpinner(ref dmarcRunning, $"\nChecking DMARC for {Target}"));
+    dmarcSpinner.Start();
     DMARC dmarc = new DMARC();
     dmarc.Domain = Target;
+    dmarcRunning = false;
+    dmarcSpinner.Join();
 
     if (dmarc.Found)
     {
@@ -76,11 +135,14 @@ try
 
     Console.ForegroundColor = prevCol;
 
-    // Verifico la presenza delle impostazioni per DKIM
-    Console.Write($"\nChecking DKIM for {Target}");
-
+    // DKIM
+    bool dkimRunning = true;
+    var dkimSpinner = new Thread(() => ShowSpinner(ref dkimRunning, $"\nChecking DKIM for {Target}"));
+    dkimSpinner.Start();
     DKIM dkim = new DKIM();
     dkim.Domain = Target;
+    dkimRunning = false;
+    dkimSpinner.Join();
 
     if (dkim.Found)
     {
