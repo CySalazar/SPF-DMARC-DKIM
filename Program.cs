@@ -25,44 +25,6 @@ try
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("Dominio non valido o vuoto.");
         Console.ForegroundColor = prevCol;
-
-    // Mostra tutti i record TXT
-    try
-    {
-        Console.WriteLine("\nRecord TXT trovati:");
-        var txtClient = new DnsClient.LookupClient();
-        var txtResults = txtClient.Query(Target, DnsClient.QueryType.TXT);
-        foreach (var record in txtResults.AllRecords)
-        {
-            if (record.RecordType.ToString() == "TXT")
-                Console.WriteLine($"\t{record}");
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"[Warning] Impossibile recuperare i record TXT: {ex.Message}");
-        Console.ForegroundColor = prevCol;
-    }
-
-    // Mostra tutti i record MX
-    try
-    {
-        Console.WriteLine("\nRecord MX trovati:");
-        var mxClient = new DnsClient.LookupClient();
-        var mxResults = mxClient.Query(Target, DnsClient.QueryType.MX);
-        foreach (var record in mxResults.AllRecords)
-        {
-            if (record.RecordType.ToString() == "MX")
-                Console.WriteLine($"\t{record}");
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"[Warning] Impossibile recuperare i record MX: {ex.Message}");
-        Console.ForegroundColor = prevCol;
-    }
         return;
     }
 
@@ -161,6 +123,83 @@ try
     }
 
     Console.ForegroundColor = prevCol;
+
+    // Mostra tutti i record TXT
+    try
+    {
+        Console.WriteLine("\nRecord TXT trovati:");
+        var txtClient = new DnsClient.LookupClient();
+        var txtResults = txtClient.Query(Target, DnsClient.QueryType.TXT);
+        foreach (var record in txtResults.AllRecords)
+        {
+            if (record.RecordType.ToString() == "TXT")
+                Console.WriteLine($"\t{record}");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"[Warning] Impossibile recuperare i record TXT: {ex.Message}");
+        Console.ForegroundColor = prevCol;
+    }
+
+    // Mostra tutti i record MX
+    try
+    {
+        Console.WriteLine("\nRecord MX trovati:");
+        var mxClient = new DnsClient.LookupClient();
+        var mxResults = mxClient.Query(Target, DnsClient.QueryType.MX);
+        foreach (var record in mxResults.AllRecords)
+        {
+            if (record.RecordType.ToString() == "MX")
+                Console.WriteLine($"\t{record}");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"[Warning] Impossibile recuperare i record MX: {ex.Message}");
+        Console.ForegroundColor = prevCol;
+    }
+
+    // Mostra tutti i record A/AAAA
+    try
+    {
+        Console.WriteLine("\nRecord IP (A/AAAA) trovati:");
+        var ipClient = new DnsClient.LookupClient();
+        
+        // Record A (IPv4)
+        var aResults = ipClient.Query(Target, DnsClient.QueryType.A);
+        foreach (var record in aResults.AllRecords)
+        {
+            if (record.RecordType.ToString() == "A")
+                Console.WriteLine($"\t{record}");
+        }
+        
+        // Record AAAA (IPv6)
+        var aaaaResults = ipClient.Query(Target, DnsClient.QueryType.AAAA);
+        foreach (var record in aaaaResults.AllRecords)
+        {
+            if (record.RecordType.ToString() == "AAAA")
+                Console.WriteLine($"\t{record}");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"[Warning] Impossibile recuperare i record IP: {ex.Message}");
+        Console.ForegroundColor = prevCol;
+    }
+
+    // Mostra tutti i selector DKIM trovati (non solo il primo)
+    if (dkim.Selectors != null && dkim.Selectors.Count > 0)
+    {
+        Console.WriteLine("\nSelector DKIM trovati:");
+        foreach (var selector in dkim.Selectors)
+        {
+            Console.WriteLine($"\t{selector}");
+        }
+    }
 }
 catch (Exception ex)
 {
