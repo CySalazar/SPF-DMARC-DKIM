@@ -21,28 +21,45 @@ namespace DNSLib
 
         private void Check()
         {
+            _dmarcFound = false;
+            _dmarcRecord = string.Empty;
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            var client = new LookupClient();
-            var results = client.Query("_dmarc." + _domain, QueryType.TXT);
-            string returnValue = string.Empty;
-            _dmarcFound = false;
-
-            foreach (var result in results.AllRecords)
+            if (string.IsNullOrWhiteSpace(_domain))
             {
-                string record = result.ToString() != null ? result.ToString() : string.Empty;
-                if (record.Contains("v=DMARC"))
+                _msToDetectDMARC = sw.ElapsedMilliseconds;
+                return;
+            }
+
+            try
+            {
+                var client = new LookupClient();
+                var results = client.Query("_dmarc." + _domain, QueryType.TXT);
+                foreach (var result in results.AllRecords)
                 {
-                    returnValue = Clean(record, "v=DMARC");
-                    _dmarcFound = true;
-                    break;
+                    string record = result?.ToString() ?? string.Empty;
+                    if (record.Contains("v=DMARC", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _dmarcRecord = Clean(record, "v=DMARC");
+                        _dmarcFound = true;
+                        break;
+                    }
                 }
             }
-            _dmarcRecord = returnValue;
-
-            sw.Stop();
-            _msToDetectDMARC = sw.ElapsedMilliseconds;
+            catch (DnsResponseException ex)
+            {
+                _dmarcRecord = $"Errore DNS: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                _dmarcRecord = $"Errore generico: {ex.Message}";
+            }
+            finally
+            {
+                sw.Stop();
+                _msToDetectDMARC = sw.ElapsedMilliseconds;
+            }
         }
     }
 }

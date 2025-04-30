@@ -84,37 +84,46 @@ namespace DNSLib
 
         private void Check()
         {
+            _dkimFound = false;
+            _dkimRecord = string.Empty;
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            var client = new LookupClient();
-            string returnValue = string.Empty;
-            _dkimFound = false;
+            if (string.IsNullOrWhiteSpace(_domain) || string.IsNullOrWhiteSpace(_selector))
+            {
+                _msDetectDKIM = sw.ElapsedMilliseconds;
+                return;
+            }
 
             try
             {
+                var client = new LookupClient();
                 var results = client.Query(_selector + "._domainkey." + _domain, QueryType.TXT);
                 foreach (var result in results.AllRecords)
                 {
-                    string record = result.ToString() != null ? result.ToString() : string.Empty;
+                    string record = result?.ToString() ?? string.Empty;
 
-                    if (record.Contains("v=DKIM"))
+                    if (record.Contains("v=DKIM", StringComparison.OrdinalIgnoreCase))
                     {
-                        returnValue = Clean(record, "v=DKIM");
+                        _dkimRecord = Clean(record, "v=DKIM");
                         _dkimFound = true;
                         break;
                     }
                 }
             }
-            catch (Exception)
+            catch (DnsResponseException ex)
             {
-                ;
+                _dkimRecord = $"Errore DNS: {ex.Message}";
             }
-            
-            _dkimRecord = returnValue;
-
-            sw.Stop();
-            _msDetectDKIM = sw.ElapsedMilliseconds;
+            catch (Exception ex)
+            {
+                _dkimRecord = $"Errore generico: {ex.Message}";
+            }
+            finally
+            {
+                sw.Stop();
+                _msDetectDKIM = sw.ElapsedMilliseconds;
+            }
         }
     }
 }

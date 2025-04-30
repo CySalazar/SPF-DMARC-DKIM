@@ -20,28 +20,45 @@ namespace DNSLib
 
         private void Check()
         {
+            _spfFound = false;
+            _spfRecord = string.Empty;
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            var client = new LookupClient();
-            var results = client.Query(_domain, QueryType.TXT);
-            string returnValue = string.Empty;
-            _spfFound = false;
-
-            foreach (var result in results.AllRecords)
+            if (string.IsNullOrWhiteSpace(_domain))
             {
-                string record = result.ToString() != null ? result.ToString() : string.Empty;
-                if (record.Contains("v=spf"))
+                _msToDetectSPF = sw.ElapsedMilliseconds;
+                return;
+            }
+
+            try
+            {
+                var client = new LookupClient();
+                var results = client.Query(_domain, QueryType.TXT);
+                foreach (var result in results.AllRecords)
                 {
-                    returnValue = Clean(record, "v=spf");
-                    _spfFound = true;
-                    break;
+                    string record = result?.ToString() ?? string.Empty;
+                    if (record.Contains("v=spf", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _spfRecord = Clean(record, "v=spf");
+                        _spfFound = true;
+                        break;
+                    }
                 }
             }
-            _spfRecord = returnValue;
-
-            sw.Stop();
-            _msToDetectSPF = sw.ElapsedMilliseconds;
+            catch (DnsResponseException ex)
+            {
+                _spfRecord = $"Errore DNS: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                _spfRecord = $"Errore generico: {ex.Message}";
+            }
+            finally
+            {
+                sw.Stop();
+                _msToDetectSPF = sw.ElapsedMilliseconds;
+            }
         }
     }
 }
