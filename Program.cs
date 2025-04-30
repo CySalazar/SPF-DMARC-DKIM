@@ -23,7 +23,7 @@ try
     if (string.IsNullOrWhiteSpace(Target))
     {
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("Dominio non valido o vuoto.");
+        Console.WriteLine("Invalid or empty domain.");
         Console.ForegroundColor = prevCol;
         return;
     }
@@ -124,10 +124,10 @@ try
 
     Console.ForegroundColor = prevCol;
 
-    // Mostra tutti i record TXT
+    // Show all TXT records
     try
     {
-        Console.WriteLine("\nRecord TXT trovati:");
+        Console.WriteLine("\nTXT Records found:");
         var txtClient = new DnsClient.LookupClient();
         var txtResults = txtClient.Query(Target, DnsClient.QueryType.TXT);
         foreach (var record in txtResults.AllRecords)
@@ -139,14 +139,14 @@ try
     catch (Exception ex)
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"[Warning] Impossibile recuperare i record TXT: {ex.Message}");
+        Console.WriteLine($"[Warning] Unable to retrieve TXT records: {ex.Message}");
         Console.ForegroundColor = prevCol;
     }
 
-    // Mostra tutti i record MX
+    // Show all MX records
     try
     {
-        Console.WriteLine("\nRecord MX trovati:");
+        Console.WriteLine("\nMX Records found:");
         var mxClient = new DnsClient.LookupClient();
         var mxResults = mxClient.Query(Target, DnsClient.QueryType.MX);
         foreach (var record in mxResults.AllRecords)
@@ -158,14 +158,14 @@ try
     catch (Exception ex)
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"[Warning] Impossibile recuperare i record MX: {ex.Message}");
+        Console.WriteLine($"[Warning] Unable to retrieve MX records: {ex.Message}");
         Console.ForegroundColor = prevCol;
     }
 
-    // Mostra tutti i record A/AAAA
+    // Show all A/AAAA records
     try
     {
-        Console.WriteLine("\nRecord IP (A/AAAA) trovati:");
+        Console.WriteLine("\nIP Records (A/AAAA) found:");
         var ipClient = new DnsClient.LookupClient();
         
         // Record A (IPv4)
@@ -187,14 +187,14 @@ try
     catch (Exception ex)
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"[Warning] Impossibile recuperare i record IP: {ex.Message}");
+        Console.WriteLine($"[Warning] Unable to retrieve IP records: {ex.Message}");
         Console.ForegroundColor = prevCol;
     }
 
-    // Mostra tutti i selector DKIM trovati (non solo il primo)
+    // Show all DKIM selectors found (not just the first one)
     if (dkim.Selectors != null && dkim.Selectors.Count > 0)
     {
-        Console.WriteLine("\nSelector DKIM trovati:");
+        Console.WriteLine("\nDKIM selectors found:");
         foreach (var selector in dkim.Selectors)
         {
             Console.WriteLine($"\t{selector}");
@@ -205,6 +205,6 @@ catch (Exception ex)
 {
     var prevCol = Console.ForegroundColor;
     Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine($"Errore: {ex.Message}");
+    Console.WriteLine($"Error: {ex.Message}");
     Console.ForegroundColor = prevCol;
 }

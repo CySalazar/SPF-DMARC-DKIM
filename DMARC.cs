@@ -49,11 +49,11 @@ namespace DNSLib
             }
             catch (DnsResponseException ex)
             {
-                _dmarcRecord = $"Errore DNS: {ex.Message}";
+                _dmarcRecord = $"DNS Error: {ex.Message}";
             }
             catch (Exception ex)
             {
-                _dmarcRecord = $"Errore generico: {ex.Message}";
+                _dmarcRecord = $"Generic Error: {ex.Message}";
             }
             finally
             {

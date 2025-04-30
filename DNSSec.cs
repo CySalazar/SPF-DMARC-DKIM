@@ -37,10 +37,10 @@ namespace DNSLib
         }
 
         /// <summary>
-        /// Associa un nome di dominio ad un indirizzo IP
+        /// Associates a domain name with an IP address
         /// </summary>
-        /// <param name="address">Indirizzo IP per cui si vuole recuperare il dominio</param>
-        /// <returns>Restituisce il dominio associato all'indirizzo IP passato</returns>
+        /// <param name="address">IP address for which you want to retrieve the domain</param>
+        /// <returns>Returns the domain associated with the provided IP address</returns>
         public string DomainFromIP(IPAddress address)
         {
             IPHostEntry host;
@@ -59,10 +59,10 @@ namespace DNSLib
         }
 
         /// <summary>
-        /// Formatta il dominio passato e lo restituisce nel formato example.com
+        /// Formats the passed domain and returns it in the format example.com
         /// </summary>
-        /// <param name="Target">Dominio da formattare</param>
-        /// <returns>Restituisce una stringa contenente il dominio formattato</returns>
+        /// <param name="Target">Domain to format</param>
+        /// <returns>Returns a string containing the formatted domain</returns>
         private static readonly string[] ProtocolsToRemove = { "http://", "https://", "ftp://", "sftp://", 
             "scp://", "ssh://", "tls://", "sftp2://", "tftp://", "ftps://" };
         private static readonly string[] MultiLevelTLDs = { "co", "plc", "com", "info", "net", "nom", "ne", "org", "web" };
@@ -105,7 +105,7 @@ namespace DNSLib
             if (saVector.Length < 2)
                 return string.Empty;
 
-            // Gestione TLD multipli (es. co.uk, com.br)
+            // Handling multi-level TLDs (e.g., co.uk, com.br)
             if (saVector.Length >= 3 && MultiLevelTLDs.Contains(saVector[saVector.Length - 2]))
             {
                 return saVector[saVector.Length - 3] + "." + saVector[saVector.Length - 2] + "." + saVector[saVector.Length - 1];
@@ -115,7 +115,7 @@ namespace DNSLib
         }
 
         /// <summary>
-        /// Suddivide una lista in più sottoliste più piccole della dimensione massima pari a ItemsPerChunk
+        /// Divides a list into multiple smaller sublists of maximum size equal to ItemsPerChunk
         /// </summary>
         public List<List<string>> ChunkBy(List<string> source, int itemsPerChunk)
         {

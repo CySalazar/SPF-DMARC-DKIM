@@ -48,11 +48,11 @@ namespace DNSLib
             }
             catch (DnsResponseException ex)
             {
-                _spfRecord = $"Errore DNS: {ex.Message}";
+                _spfRecord = $"DNS Error: {ex.Message}";
             }
             catch (Exception ex)
             {
-                _spfRecord = $"Errore generico: {ex.Message}";
+                _spfRecord = $"Generic Error: {ex.Message}";
             }
             finally
             {

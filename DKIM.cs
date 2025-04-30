@@ -113,11 +113,11 @@ namespace DNSLib
             }
             catch (DnsResponseException ex)
             {
-                _dkimRecord = $"Errore DNS: {ex.Message}";
+                _dkimRecord = $"DNS Error: {ex.Message}";
             }
             catch (Exception ex)
             {
-                _dkimRecord = $"Errore generico: {ex.Message}";
+                _dkimRecord = $"Generic Error: {ex.Message}";
             }
             finally
             {
