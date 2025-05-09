@@ -1,9 +1,3 @@
-bin/Debug/net6.0/SPF-DMARC-DKIM.dll
-bin/Debug/net6.0/SPF-DMARC-DKIM.pdb
-obj/Debug/net6.0/SPF-DMARC-DKIM.AssemblyInfo.cs
-obj/Debug/net6.0/SPF-DMARC-DKIM.AssemblyInfoInputs.cache
-obj/Debug/net6.0/SPF-DMARC-DKIM.dll
-obj/Debug/net6.0/SPF-DMARC-DKIM.pdb
-obj/Debug/net6.0/SPF-DMARC-DKIM.sourcelink.json
-obj/Debug/net6.0/ref/SPF-DMARC-DKIM.dll
-obj/Debug/net6.0/refint/SPF-DMARC-DKIM.dll
+bin/
+obj/
+.vscode/
