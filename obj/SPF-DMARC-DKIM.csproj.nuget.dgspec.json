@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/matteosala/SPF-DMARC-DKIM/SPF-DMARC-DKIM.csproj": {}
+    "/Users/matteosala/Documents/Repos/SPF-DMARC-DKIM/SPF-DMARC-DKIM.csproj": {}
   },
   "projects": {
-    "/Users/matteosala/SPF-DMARC-DKIM/SPF-DMARC-DKIM.csproj": {
+    "/Users/matteosala/Documents/Repos/SPF-DMARC-DKIM/SPF-DMARC-DKIM.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/matteosala/SPF-DMARC-DKIM/SPF-DMARC-DKIM.csproj",
+        "projectUniqueName": "/Users/matteosala/Documents/Repos/SPF-DMARC-DKIM/SPF-DMARC-DKIM.csproj",
         "projectName": "SPF-DMARC-DKIM",
-        "projectPath": "/Users/matteosala/SPF-DMARC-DKIM/SPF-DMARC-DKIM.csproj",
+        "projectPath": "/Users/matteosala/Documents/Repos/SPF-DMARC-DKIM/SPF-DMARC-DKIM.csproj",
         "packagesPath": "/Users/matteosala/.nuget/packages/",
-        "outputPath": "/Users/matteosala/SPF-DMARC-DKIM/obj/",
+        "outputPath": "/Users/matteosala/Documents/Repos/SPF-DMARC-DKIM/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/matteosala/.nuget/NuGet/NuGet.Config"

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "hJ/cgfI7iQc=",
+  "dgSpecHash": "RQ55G7UhE+8=",
   "success": true,
-  "projectFilePath": "/Users/matteosala/SPF-DMARC-DKIM/SPF-DMARC-DKIM.csproj",
+  "projectFilePath": "/Users/matteosala/Documents/Repos/SPF-DMARC-DKIM/SPF-DMARC-DKIM.csproj",
   "expectedPackageFiles": [
     "/Users/matteosala/.nuget/packages/dnsclient/1.6.1/dnsclient.1.6.1.nupkg.sha512",
     "/Users/matteosala/.nuget/packages/microsoft.netcore.platforms/5.0.0/microsoft.netcore.platforms.5.0.0.nupkg.sha512",

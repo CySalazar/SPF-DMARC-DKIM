@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace DNSLib
 {
+    // Consider renaming this class if DNSSEC-specific features are not planned (e.g., to DnsUtilities or DomainQueryBase)
     public class DNSSec
     {
         protected string _domain = string.Empty;
@@ -19,22 +20,10 @@ namespace DNSLib
             _domain = (Target != null && Target != string.Empty) ? DomainFormatter(Target) : string.Empty;
         }
 
-        protected virtual string Clean(string Target, string Parameter)
-        {
-            if (string.IsNullOrEmpty(Target) || string.IsNullOrEmpty(Parameter))
-                return Target;
-
-            int pos = Target.IndexOf(Parameter, StringComparison.OrdinalIgnoreCase);
-            if (pos < 0)
-                return Target;
-
-            string tmp = Target.Substring(pos);
-            int quotePos = tmp.IndexOf('"');
-            if (quotePos > 0)
-                tmp = tmp.Remove(quotePos);
-
-            return tmp;
-        }
+        // Il metodo Clean() è stato rimosso poiché non più utilizzato.
+        // Le classi SPF, DMARC, DKIM ora gestiscono l'estrazione del testo dei record
+        // direttamente dalle proprietà degli oggetti record forniti da DnsClient
+        // o tramite parsing specifico (come per DMARC).
 
         /// <summary>
         /// Associates a domain name with an IP address
@@ -51,9 +40,10 @@ namespace DNSLib
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                // It's better to throw the original exception or wrap it
+                // throw; 
+                throw new Exception($"Failed to get host entry for {address}: {e.Message}", e);
             }
-
 
             return host.HostName;
         }
@@ -65,7 +55,9 @@ namespace DNSLib
         /// <returns>Returns a string containing the formatted domain</returns>
         private static readonly string[] ProtocolsToRemove = { "http://", "https://", "ftp://", "sftp://", 
             "scp://", "ssh://", "tls://", "sftp2://", "tftp://", "ftps://" };
-        private static readonly string[] MultiLevelTLDs = { "co", "plc", "com", "info", "net", "nom", "ne", "org", "web" };
+        // The MultiLevelTLDs array and associated logic for extracting a "root" domain have been commented out
+        // as SPF/DMARC/DKIM checks typically operate on the FQDN provided.
+        // private static readonly string[] MultiLevelTLDs = { "co", "plc", "com", "info", "net", "nom", "ne", "org", "web" };
 
         public string DomainFormatter(string Target)
         {
@@ -80,10 +72,13 @@ namespace DNSLib
                 try
                 {
                     sTarget = DomainFromIP(IPTmp);
+                    // After getting hostname from IP, ensure it's also lowercased and trimmed
+                    sTarget = sTarget.Trim().ToLower(); 
                 }
                 catch
                 {
-                    return string.Empty;
+                    // If DomainFromIP fails, return empty or handle as an invalid domain for checks
+                    return string.Empty; 
                 }
             }
 
@@ -92,7 +87,7 @@ namespace DNSLib
                 if (sTarget.StartsWith(proto))
                 {
                     sTarget = sTarget.Substring(proto.Length);
-                    break;
+                    break; 
                 }
             }
 
@@ -100,18 +95,15 @@ namespace DNSLib
             if (slashIdx >= 0)
                 sTarget = sTarget.Substring(0, slashIdx);
 
-            var saVector = sTarget.Split('.');
-
-            if (saVector.Length < 2)
+            // After removing protocol and path, return the remaining string as is.
+            // This ensures that checks are performed on the fully qualified domain name (FQDN)
+            // as provided by the user (e.g., 'sub.example.com' remains 'sub.example.com').
+            // The previous logic to extract a "base" domain (e.g. example.com from sub.example.com)
+            // has been removed as it's not suitable for direct SPF/DMARC/DKIM lookups which require the specific FQDN.
+            if (sTarget.Split('.').Length < 2 && !IPAddress.TryParse(sTarget, out _)) // Basic check for at least one dot, unless it's an IP that couldn't be resolved
                 return string.Empty;
 
-            // Handling multi-level TLDs (e.g., co.uk, com.br)
-            if (saVector.Length >= 3 && MultiLevelTLDs.Contains(saVector[saVector.Length - 2]))
-            {
-                return saVector[saVector.Length - 3] + "." + saVector[saVector.Length - 2] + "." + saVector[saVector.Length - 1];
-            }
-
-            return saVector[saVector.Length - 2] + "." + saVector[saVector.Length - 1];
+            return sTarget;
         }
 
         /// <summary>
@@ -120,7 +112,9 @@ namespace DNSLib
         public List<List<string>> ChunkBy(List<string> source, int itemsPerChunk)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            if (source.Count == 0) throw new ArgumentException("Source list is empty.");
+            if (itemsPerChunk <= 0) throw new ArgumentOutOfRangeException(nameof(itemsPerChunk), "itemsPerChunk must be greater than 0.");
+            if (source.Count == 0) return new List<List<string>>(); // Return empty list of lists for empty source
+
             var results = new List<List<string>>();
             for (int i = 0; i < source.Count; i += itemsPerChunk)
                 results.Add(source.Skip(i).Take(itemsPerChunk).ToList());

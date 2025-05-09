@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SPF-DMARC-DKIM")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d851810a1d9ae84aeb9fea679643052932117394")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a3ca18c73f040926853d1aa89defbe7bde3d1968")]
 [assembly: System.Reflection.AssemblyProductAttribute("SPF-DMARC-DKIM")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SPF-DMARC-DKIM")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

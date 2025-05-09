@@ -2,21 +2,34 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+// using System.Text; // Non sembra usato direttamente
 using System.Threading.Tasks;
 using System.Diagnostics;
 
 namespace DNSLib
 {
+    public class DkimTag
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Value { get; set; } = string.Empty;
+    }
+
+    public class DkimResult
+    {
+        public string Selector { get; set; } = string.Empty;
+        public string RawRecord { get; set; } = string.Empty; // Rinomina da Record a RawRecord
+        public bool IsFound { get; set; }
+        public string? ErrorMessage { get; set; }
+        public long DetectionTimeMs { get; set; }
+        public List<DkimTag> ParsedTags { get; set; } = new List<DkimTag>();
+    }
+
     public class DKIM : DNSSec
     {
-        private string _dkimRecord = string.Empty;
-        private bool _dkimFound = false;
-        private bool _scanComplete = false;
-        private string _selector = string.Empty;
-        private long _msDetectSelector = 0;
-        private long _msDetectDKIM = 0;
-        private List<string> _selectorList = new List<string>()
+        private LookupClient _client;
+        private long _msDetectAllSelectors = 0;
+
+        private List<string> _commonSelectorsList = new List<string>()
         {
             "2013-03", "20161025", "alfa", "beta", "cm", "default", "delta", "dkim", "google",
             "k1", "k2", "k3", "k4", "k5", "m1", "m2", "m3", "m4", "m5", "mail", "mandrill", "my1",
@@ -25,104 +38,151 @@ namespace DNSLib
             "selector1-wwecorp-com", "selector2", "smtp", "smtpapi", "test", "zendesk", "zendesk1",
             "ml", "consulenze"
         };
-        private List<string> _selectorsFound = new List<string>();
-
-        public string Record => _dkimRecord;
-        public bool Found => _dkimFound && _scanComplete;
+        
+        public List<DkimResult> Results { get; private set; } = new List<DkimResult>();
+        public bool Found => Results.Any(r => r.IsFound);
         public string Domain { get => _domain; set => SetDomain(value); }
-        public string Selector => _selector;
-        public List<string> Selectors => _selectorsFound;
-        public long TimeToDetectSelector => _msDetectSelector;
-        public long TimeToDetectDKIM => _msDetectDKIM;
+        
+        public long TimeToDetectSelector => _msDetectAllSelectors; // Tempo per scansionare tutti i selettori comuni
+
+        public DKIM(LookupClient? client = null)
+        {
+            _client = client ?? new LookupClient();
+        }
 
         protected override void SetDomain(string Target)
         {
             base.SetDomain(Target);
-            FindSelectors();
-            if (_selectorsFound.Count > 0)
+            // Il caricamento effettivo avverrà tramite LoadAsync.
+            // Results.Clear() sarà chiamato in LoadAsync.
+        }
+
+        public async Task LoadAsync(string targetDomain)
+        {
+            string formattedDomain = DomainFormatter(targetDomain);
+            if (string.IsNullOrWhiteSpace(formattedDomain) && !string.IsNullOrWhiteSpace(targetDomain))
             {
-                _selector = _selectorsFound[_selectorsFound.Count - 1];
-                Check();
+                 _domain = targetDomain; // Usa il target originale se la formattazione fallisce ma c'era input
             }
             else
             {
-                _dkimFound = false;
+                _domain = formattedDomain;
             }
+            Results.Clear(); // Pulisci i risultati precedenti prima di un nuovo caricamento
+            await FindAllSelectorsAsync();
         }
 
-        private void FindSelectors()
+        private async Task FindAllSelectorsAsync()
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            if (_domain == string.Empty)
+            if (string.IsNullOrWhiteSpace(_domain))
             {
+                _msDetectAllSelectors = sw.ElapsedMilliseconds;
                 return;
             }
-
-            _selectorsFound.Clear();
-            _scanComplete = false;
-
-            foreach (string selector in _selectorList)
+            
+            var tasks = new List<Task<DkimResult>>();
+            foreach (string commonSelector in _commonSelectorsList)
             {
-                _dkimFound = false;
-                _selector = selector;
-
-                Check();
-                if (_dkimFound)
-                {
-                    _selectorsFound.Add(_selector);
-                    break;
-                }
+                tasks.Add(CheckSingleSelectorAsync(commonSelector));
             }
 
-            _scanComplete = true;
+            var individualResults = await Task.WhenAll(tasks);
+            Results.AddRange(individualResults.Where(r => r.IsFound || !string.IsNullOrEmpty(r.ErrorMessage)));
 
             sw.Stop();
-            _msDetectSelector = sw.ElapsedMilliseconds;
+            _msDetectAllSelectors = sw.ElapsedMilliseconds;
         }
 
-        private void Check()
+        private async Task<DkimResult> CheckSingleSelectorAsync(string selectorToTest)
         {
-            _dkimFound = false;
-            _dkimRecord = string.Empty;
+            var dkimCheckResult = new DkimResult { Selector = selectorToTest };
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            if (string.IsNullOrWhiteSpace(_domain) || string.IsNullOrWhiteSpace(_selector))
+            if (string.IsNullOrWhiteSpace(_domain))
             {
-                _msDetectDKIM = sw.ElapsedMilliseconds;
-                return;
+                dkimCheckResult.ErrorMessage = "Domain is null or whitespace.";
+                dkimCheckResult.DetectionTimeMs = sw.ElapsedMilliseconds;
+                return dkimCheckResult;
             }
 
             try
             {
-                var client = new LookupClient();
-                var results = client.Query(_selector + "._domainkey." + _domain, QueryType.TXT);
-                foreach (var result in results.AllRecords)
-                {
-                    string record = result?.ToString() ?? string.Empty;
+                var dnsResults = await _client.QueryAsync(selectorToTest + "._domainkey." + _domain, QueryType.TXT);
+                string? foundRecordText = null;
 
-                    if (record.Contains("v=DKIM", StringComparison.OrdinalIgnoreCase))
+                foreach (var dnsRecord in dnsResults.AllRecords)
+                {
+                    string recordText = dnsRecord?.ToString() ?? string.Empty;
+                    if (dnsRecord is DnsClient.Protocol.TxtRecord txtRecord)
                     {
-                        _dkimRecord = Clean(record, "v=DKIM");
-                        _dkimFound = true;
-                        break;
+                        recordText = string.Join("", txtRecord.Text);
                     }
+
+                    if (recordText.StartsWith("v=DKIM1", StringComparison.OrdinalIgnoreCase))
+                    {
+                        foundRecordText = recordText;
+                        break; 
+                    }
+                }
+
+                if (foundRecordText != null)
+                {
+                    dkimCheckResult.RawRecord = foundRecordText;
+                    dkimCheckResult.IsFound = true;
+                    ParseDkimRecord(foundRecordText, dkimCheckResult);
                 }
             }
             catch (DnsResponseException ex)
             {
-                _dkimRecord = $"DNS Error: {ex.Message}";
+                // Fallback: Check exception message for NXDOMAIN indicators
+                string msg = ex.Message.ToLowerInvariant();
+                if (msg.Contains("non-existent domain") || msg.Contains("nxdomain"))
+                {
+                    dkimCheckResult.IsFound = false; 
+                }
+                else
+                {
+                    dkimCheckResult.ErrorMessage = $"DNS Error for selector {selectorToTest}: {ex.Message} (Code: {ex.Code})";
+                }
             }
             catch (Exception ex)
             {
-                _dkimRecord = $"Generic Error: {ex.Message}";
+                dkimCheckResult.ErrorMessage = $"Generic Error for selector {selectorToTest}: {ex.Message}";
             }
             finally
             {
                 sw.Stop();
-                _msDetectDKIM = sw.ElapsedMilliseconds;
+                dkimCheckResult.DetectionTimeMs = sw.ElapsedMilliseconds;
+            }
+            return dkimCheckResult;
+        }
+
+        private void ParseDkimRecord(string recordText, DkimResult dkimResult)
+        {
+            dkimResult.ParsedTags.Clear();
+            if (string.IsNullOrWhiteSpace(recordText)) return;
+
+            // I tag DKIM sono separati da ';'
+            // Ogni tag è nella forma nome=valore
+            // Gli spazi bianchi attorno a ';' e '=' dovrebbero essere ignorati.
+            var tagPairs = recordText.Split(';')
+                                     .Select(p => p.Trim())
+                                     .Where(p => !string.IsNullOrWhiteSpace(p));
+
+            foreach (var pair in tagPairs)
+            {
+                var parts = pair.Split(new[] { '=' }, 2);
+                string tagName = parts[0].Trim().ToLowerInvariant(); // I nomi dei tag sono case-insensitive
+                string tagValue = (parts.Length > 1) ? parts[1].Trim() : string.Empty;
+                
+                // Il tag 'p' può essere vuoto per indicare che la chiave è stata revocata.
+                // Non è necessaria una gestione speciale qui, il valore sarà string.Empty.
+                
+                dkimResult.ParsedTags.Add(new DkimTag { Name = tagName, Value = tagValue });
             }
         }
     }
